@@ -1,1 +1,1 @@
-# mi_faust
+# Faust Mass Interaction
