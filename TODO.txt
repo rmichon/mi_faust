@@ -1,0 +1,38 @@
+MI FAUST / TODO
+
+
+**********************************************
+
+Model initialisation: for recursive letrecs, the delayed position ' variables seem to be set to 0.
+They should be set to the delayed position of the masses connected to them !
+
+
+----
+
+
+NLBOW interaction doesn't seem to be working properly
+
+
+-----
+
+
+Force input to model: add a module or a simple mechanism to do this (could be a signal connected straight to a mass)
+Should work exactly the same as a regular mass, by only adding the signal to the routing
+
+-----
+
+Audio rate parameters inside the model: already in the faust logic
+Integrate into MIMS generator so that an audioRateParam is generated in Faust just like a regular param.
+
+
+------
+
+Demo models to create:
+	
+	basic oscillator / percussion model ("miHelloMass")
+	Basic MIDI control (implicit polyphony mechanism with a simple model)
+	plucked string (with harmonics and/or fret mechanisms)
+	bowed string
+	membrane or irregular topology (for complex routing tables)
+	physical resonator responding to audio input.
+	"slow" physical model to control other audio DSP processes (AM, FM...?) 
