@@ -27,6 +27,12 @@ Integrate into MIMS generator so that an audioRateParam is generated in Faust ju
 
 ------
 
+
+Position inputs do not work correctly if there are several of them in the model !
+Need to fix this ASAP.
+
+------
+
 Demo models to create:
 	
 	basic oscillator / percussion model ("miHelloMass")
