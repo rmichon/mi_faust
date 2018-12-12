@@ -2,7 +2,12 @@ ma = library("maths.lib");
 ba = library("basics.lib");
 
 // initialize the state of a variable in a letrec system (only first order)
-initState(init) = +(init : ba.impulsify);
+//initState(init) = +(init : ba.impulsify);
+initState((init)) = R(0,init)
+with{
+  R(n,(initn,init)) = +(initn : ba.impulsify@n) : R(n+1,init);
+  R(n,initn) = +(initn : ba.impulsify@n);
+};
 
 // integrated oscillator (mass-spring-ground system)
 // m, k, z: mass, stiffness, damping (algorithmic values)
@@ -14,7 +19,7 @@ with{
   C = 1/m;
   equation = x 
 	letrec{
-  		'x = A*(x : initState(x0)) + B*(x' : initState(x1)) + *(C);
+    'x = A*(x : initState(x0)) + B*(x' : initState(x1)) + *(C);
 	};
 };
 
@@ -28,7 +33,7 @@ with{
   C = 1/m;
   equation = x 
 	letrec{
-  		'x = A*(x : initState(x0)) + B*(x' + (x1 : ba.impulsify) + (x0 : ba.impulsify)') + *(C);
+    'x = A*(x : initState(x0)) + B*(x' : initState((x1,x0))) + *(C);
 	};
 };
 
