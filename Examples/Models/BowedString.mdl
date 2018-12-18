@@ -1,10 +1,10 @@
 @low_M param  1.0
-@low_K param  0.5
-@low_Z param 0.01
+@low_K param  0.3
+@low_Z param 0.001
 
 
-@nlZ param 0.1                                    
-@nlscale param 0.0005
+@nlZ param 0.08                                    
+@nlscale param 0.00005
 
 @low_s0 ground 0.
 @low_m0 mass low_M 0. 0.
@@ -311,10 +311,10 @@
 @low_r149 spring @low_m148 @low_m149 low_K low_Z
 @low_r150 spring @low_m149 @low_s1 low_K low_Z
 
-@bigMass mass 100000 0. 0.0001
+@in1 posInput 1.
 
-@out1 posOutput @low_m20
-@out2 posOutput @low_m10
+@out1 posOutput @low_m30
+@out2 posOutput @low_m40
 
 
-@nlb0 nlBow @bigMass @low_m140 nlK nlscale  
+@nlb0 nlBow @in1 @low_m133 nlZ nlscale  
