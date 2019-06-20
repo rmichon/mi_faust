@@ -31,3 +31,13 @@ All the algorithms implemented in `mi_faust` and presented in this repository ar
 * Nicolas Castagné and Claude Cadoz. Genesis 3: Plate-forme pour la création musicale à l'aide des modèles physiques Cordis-Anima. In Proceedings of the Journée de l'Informatique Musicale, Grenoble, France, 2009. 
 * Edgar Berdahl and Julius O. Smith. An Introduction to the Synth-A-Modeler Compiler: Modular and Open-Source Sound Synthesis using Physical Models. In Proceedings of the Linux Audio Conference (LAC-12), Stanford, USA, 2012.
 * James Leonard and Claude Cadoz. Physical Modelling Concepts for a Collection of Multisensory Virtual Musical Instruments. In Proceedings of the New Interfaces for Musical Expression (NIME-15) Conference, Baton Rouge, USA, 2015.
+
+## License
+
+The MIT License (MIT)
+
+Copyright (c) <2019> <GRAME-CNCM (Lyon, France) and Gipsa-Lab (Grenoble, France)>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
