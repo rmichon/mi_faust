@@ -18,4 +18,16 @@ The `/documentation` folder contains a LAC paper which is currently the best doc
 
 ## Credits
 
-This project is the fruit of a collaboration between [GIPSA-Lab](TODO:URL) (Grenoble INP, France) and [GRAME-CNCM](https://grame.fr) (Lyon, France). 
+This project is the fruit of a collaboration between [GIPSA-Lab](http://www.gipsa-lab.fr/) (Grenoble INP, France) and [GRAME-CNCM](https://grame.fr) (Lyon, France). 
+
+## Sources
+
+All the algorithms implemented in `mi_faust` and presented in this repository are in the public domain and are disclosed in the following scientific publications:
+
+* Claude Cadoz, Annie Luciani, Jean-Loup Florens, Curtis Roads and Françoise Chabade. Responsive Input Devices and Sound Synthesis by Stimulation of Instrumental Mechanisms: The Cordis System. Computer Music Journal, Vol 8., No. 3, 1984.
+* Claude Cadoz, Annie Luciani and Jean Loup Florens. CORDIS-ANIMA: A Modeling and Simulation System for Sound and Image Synthesis: The General Formalism. Computer Music Journal. Vol. 17, No. 1, 1993.
+* Alexandros Kontogeorgakopoulos and Claude Cadoz. Cordis Anima Physical Modeling and Simulation System Analysis. In Proceedings of the Sound and Music Computing Conference (SMC-07), Lefkada, Greece, 2007.
+* Nicolas Castagne, Claude Cadoz, Ali Allaoui and Olivier Tache. G3: Genesis Software Environment Update. In Proceedings of the International Computer Music Conference (ICMC-09), Montreal, Canada, 2009.
+* Nicolas Castagné and Claude Cadoz. Genesis 3: Plate-forme pour la création musicale à l'aide des modèles physiques Cordis-Anima. In Proceedings of the Journée de l'Informatique Musicale, Grenoble, France, 2009. 
+* Edgar Berdahl and Julius O. Smith. An Introduction to the Synth-A-Modeler Compiler: Modular and Open-Source Sound Synthesis using Physical Models. In Proceedings of the Linux Audio Conference (LAC-12), Stanford, USA, 2012.
+* James Leonard and Claude Cadoz. Physical Modelling Concepts for a Collection of Multisensory Virtual Musical Instruments. In Proceedings of the New Interfaces for Musical Expression (NIME-15) Conference, Baton Rouge, USA, 2015.
