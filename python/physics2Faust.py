@@ -1,10 +1,14 @@
-######################################################
-#           File: phyMdlCodeParser.py                                                       #
-#           Author:     James Leonard                                                            #
-#           Date:           23/03/2017                                                                  #
-#         Read an input phyMdl file and generate the codebox     #
-#         code for use inside gen, then save it to an output file     #
-######################################################
+#
+# Author: James Leonard
+# Date: 10/04/2020
+#
+# This file is part of the mi_faust project, distributed under the MIT licence.
+# see https://github.com/rmichon/mi_faust for more details.
+#
+#
+# This script takes "MIMS" format mass-interaction model files, and generates FAUST code.
+# usage: [python or python3] physics2Faust.py [model file] [output destination file]
+
 
 import sys
 import pprint
@@ -128,7 +132,7 @@ class Physics2Faust():
                             self.linkModuleDict["spring"].append([l[0], l[2], l[3], l[4], l[5]])
                         else:
                             break
-                    if l[1] == "detent":
+                    if l[1] == "detent" or l[1] == "contact":
                         if (len(l) == 7):
                             self.linkModuleDict["collision"].append([l[0], l[2], l[3], l[4], l[5], l[6]])
                         else:

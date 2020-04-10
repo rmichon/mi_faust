@@ -58,17 +58,21 @@ spring(k,z,x1r0,x2r0,x1,x2) =
 // nlPluck
 // 1D non-linear picking Interaction algorithm
 nlPluck(k,scale,x1,x2) = 
-  select2(
-    absdeltapos>scale,
-    select2(
-      absdeltapos>(scale*0.5),
-      k*deltapos,
-      k*(ma.signum(deltapos)*scale*0.5 - deltapos)),
-    0) <:  *(-1),_
+  select2(absdeltapos < tipdist,
+    select2(absdeltapos < scale,
+	  		0,
+	  		ma.signum(deltapos)* -tipdist * Kp + k * deltapos
+	  		),
+	(Kp - k) * -deltapos
+	) <:  *(-1),_
 with{
   deltapos = x1 - x2;
   absdeltapos = abs(deltapos);
+  sharpness = 10;
+  tipdist = scale / sharpness;
+  Kp = k * sharpness;
 };
+
 
 // nlBow
 // 1D non-linear bowing Interaction algorithm 
@@ -89,7 +93,7 @@ with{
 // k,z: stiffness and daming (algorithmic values)
 // thres: position threshold for the collision to be active
 collision(k,z,thres,x1r0,x2r0,x1,x2) = 
-  spring(k,z,x1r0,x2r0,x1,x2) : (select2(comp,0,_),select2(comp,0,_))
+  spring(k,z,x1r0,x2r0,x1,x2-thres) : (select2(comp,0,_),select2(comp,0,_))
 with{
   comp = (x2-x1) < thres;
 };
