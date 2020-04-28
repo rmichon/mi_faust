@@ -1,47 +1,69 @@
+/**
+  * Mass-interaction physics library for FAUST
+  * Contains basic physical component definitions and utility functions
+  *
+  * Part of the mi_faust project, developped by James Leonard & Romain Michon
+  * 
+  * see: https://github.com/rmichon/mi_faust
+  * see: http://mi-creative.eu/tool_miFaust.html
+  * see: http://mi-creative.eu/paper_lac19.html
+*/
+
+
 ma = library("maths.lib");
 ba = library("basics.lib");
 
-// initialize the state of a variable in a letrec system (only first order)
-//initState(init) = +(init : ba.impulsify);
-initState((init)) = R(0,init)
+/*
+ initialize the state of a variable in a letrec system (only first order)
+ used for the first simulation step.
+*/
+initState(init) = R(0,init)
 with{
   R(n,(initn,init)) = +(initn : ba.impulsify@n) : R(n+1,init);
   R(n,initn) = +(initn : ba.impulsify@n);
 };
 
-// integrated oscillator (mass-spring-ground system)
-// m, k, z: mass, stiffness, damping (algorithmic values)
-// x0, x1: initial position and delayed position
-osc(m,k,z,x0,x1) = equation
+
+/* 
+ integrated oscillator (mass-spring-ground system)
+    m, k, z, gravity: mass, stiffness, damping (algorithmic values) and gravity
+    x0, x1: initial position and delayed position
+*/
+osc(m, k, z, grav, x0, x1) = equation
 with{
   A = 2 - (k + z)/m;
   B = z/m - 1;
   C = 1/m;
   equation = x 
 	letrec{
-    'x = A*(x : initState(x0)) + B*(x' : initState(x1)) + *(C);
+    'x = A*(x : initState(x0)) + B*(x' : initState(x1)) + (_-grav)*(C);
 	};
 };
 
-// punctual mass module
-// m: mass (algorithmic value)
-// x0, x1: initial position and delayed position
-mass(m,x0,x1) = equation
+
+/* 
+ punctual mass module
+    m, gravity: mass and gravity
+    x0, x1: initial position and delayed position
+*/
+mass(m, grav, x0, x1) = equation
 with{
   A = 2;
   B = -1;
   C = 1/m;
   equation = x 
 	letrec{
-    'x = A*(x : initState(x0)) + B*(x' : initState((x1,x0))) + *(C);
+    'x = A*(x : initState(x0)) + B*(x' : initState((x1,x0))) + (_-grav)*(C);
 	};
 };
 
-// punctual ground module
-// x0: initial position
+/* 
+ Fixed Point module
+    x0: initial position
+*/
 ground(x0) = equation
 with{
-  // could this term be removed or simlified? Need "unused" input force signal for routing scheme
+  // could this term be removed or simlified? Need "unused" input force signal for the routing scheme to work
   C = 0;
   equation = x 
 	letrec{
@@ -49,53 +71,167 @@ with{
 	};
 };
 
-// spring
-// k,z: stiffness and daming (algorithmic values)
-spring(k,z,x1r0,x2r0,x1,x2) = 
-  k*(x1-x2) + 
-  z*((x1 - (x1' : initState(x1r0))) - (x2 - (x2' : initState(x2r0)))) <: *(-1),_;
 
-// nlPluck
-// 1D non-linear picking Interaction algorithm
-nlPluck(k,scale,x1,x2) = 
+/* 
+ Elastic Spring module
+    k: stiffness (algorithmic value)
+*/
+spring(k, x1r0, x2r0, x1, x2) = 
+  k*deltapos <: *(-1),_
+with{
+    deltapos = x1-x2;
+};
+
+/* 
+ Elastic Damper module
+    k: damping (algorithmic value)
+*/
+damper(z, x1r0, x2r0, x1, x2) = 
+  z*deltavel <: *(-1),_
+with{
+    deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+};
+
+
+/* 
+ Linear Spring-Damper module
+    k, z: stiffness and damping (algorithmic values)
+*/
+springDamper(k, z, x1r0, x2r0, x1, x2) = 
+  k*deltapos + 
+  z*deltavel <: *(-1),_
+with{
+    deltapos = x1-x2;
+    deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+};
+
+
+/* 
+ Non-linear (quadratic) Spring-Damper module
+    k, q, z: stiffness, quatratic term and damping (algorithmic values)
+*/
+nlSpringDamper2(k, q, z, x1r0, x2r0, x1, x2) =
+  k*deltapos + q * ma.signum(deltapos) * pow(deltapos, 2) +
+  z*deltavel <: *(-1),_
+with{
+    deltapos = x1-x2;
+    deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+};
+
+/* 
+ Non-linear (cubic) Spring-Damper module
+    k, q, z: stiffness, cubic term and damping (algorithmic values)
+*/
+nlSpringDamper3(k, q, z, x1r0, x2r0, x1, x2) =
+  k*deltapos + q * pow(deltapos, 3) +
+  z*deltavel <: *(-1),_
+with{
+    deltapos = x1-x2;
+    deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+};
+
+/* 
+ Non-linear (cubic) Spring-Damper module with bound stiffness
+    s, c, k, z: stiffness, cubic term, bounding linear stiffness and damping (algorithmic values)
+    The bounding term stops the interaction from becoming unstable at high displacements
+*/
+nlSpringDamperClipped(s, c, k, z, x1r0, x2r0, x1, x2) =
+    select2(c == 0,
+        select2(s >= k,
+            select2(absdeltapos <= b,
+                // Overdamping induced here to prevent "locked" states...
+                k * deltapos + (z+0.3*k)*deltavel,
+                s * deltapos + c * pow(deltapos, 3) + z*deltavel
+            ),
+            k * deltapos + z*deltavel
+        ),
+        s * deltapos + z*deltavel
+    )<: *(-1),_
+with{
+    b = sqrt(k-s)/c;
+    deltapos = x1-x2;
+    deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+    absdeltapos = abs(deltapos);
+
+};
+
+
+
+/* 
+ Non-linear plucking interaction
+    k, scale, z: non-linear stiffness amount, scaling term and damping (algorithmic values)
+    The sharpness at the tipping point is fixed
+*/
+nlPluck(k, scale, z, x1r0, x2r0, x1, x2) = 
   select2(absdeltapos < tipdist,
     select2(absdeltapos < scale,
 	  		0,
-	  		ma.signum(deltapos)* -tipdist * Kp + k * deltapos
+	  		ma.signum(deltapos)* -tipdist * k + Kend * deltapos + 
+              z* deltavel
 	  		),
-	(Kp - k) * -deltapos
+	(k - Kend) * -deltapos
 	) <:  *(-1),_
 with{
   deltapos = x1 - x2;
+  deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+
   absdeltapos = abs(deltapos);
   sharpness = 10;
   tipdist = scale / sharpness;
-  Kp = k * sharpness;
+  Kend = k / sharpness;
 };
 
 
-// nlBow
-// 1D non-linear bowing Interaction algorithm 
-nlBow(z,scale,x1r0,x2r0,x1,x2) = 
-  select2(
-    absspeed>scale,
-    select2(
-      absspeed>(scale*0.333),
-      z*speed,
-      z*(ma.signum(speed)*scale*0.333) - z*0.25*speed),
-    0) <: *(-1),_
+/* 
+ Non-linear bowing interaction
+    z, scale: non-linear friction amount, scaling term (algorithmic values)
+    The sharpness at the tipping point is fixed
+*/
+nlBow(z, scale, type, x1r0, x2r0, x1, x2) =
+  select2(type > 0,
+    select2(absdeltavel < tipvel,
+        select2(absdeltavel < scale,
+	  		0,
+	  		ma.signum(deltavel)* tipvel * z - Zend * deltavel
+	  		),
+	    (z - Zend) * deltavel
+	),
+    0.63 * z * deltavel *exp(-4*pow(deltavel/scale, 2) + 1/2)
+  )
+   <:  *(-1),_
 with{
-  speed = ((x1 - x1') - (x2 - x2'));
-  absspeed = abs(speed);
+  deltavel = (x1 - x1' : initState(x1r0)) - (x2 - x2' : initState(x2r0));
+  absdeltavel = abs(deltavel);
+  sharpness = 3;
+  tipvel = scale / sharpness;
+  Zend = z / sharpness;
 };
 
-// collision
-// k,z: stiffness and daming (algorithmic values)
-// thres: position threshold for the collision to be active
+/*
+ collision interaction (producing linear viscoelastic forces when in contact)
+    k,z: stiffness and daming (algorithmic values)
+    thres: position threshold for the collision to be active
+*/
 collision(k,z,thres,x1r0,x2r0,x1,x2) = 
-  spring(k,z,x1r0,x2r0,x1,x2-thres) : (select2(comp,0,_),select2(comp,0,_))
+  springDamper(k,z,x1r0,x2r0,x1+thres,x2) : (select2(comp,0,_),select2(comp,0,_))
 with{
   comp = (x2-x1) < thres;
 };
 
+
+/*
+ non linear bounded collision interaction (producing non-linear viscoelastic forces when in contact)
+    s, c, k, z: linear stiffness, cubic stiffness, bounding stiffness and daming (algorithmic values)
+    thres: position threshold for the collision to be active
+*/
+nlCollisionClipped(s, c, k, z, thres, x1r0, x2r0, x1, x2) = 
+  nlSpringDamperClipped(s,c,k,z,x1r0,x2r0,x1+thres,x2) : (select2(comp,0,_),select2(comp,0,_))
+with{
+  comp = (x2-x1) < thres;
+};
+
+
+/*
+ position input module
+*/
 posInput(init) = _,_ : !,_ : initState(init);
