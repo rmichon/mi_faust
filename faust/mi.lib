@@ -371,7 +371,7 @@ with{
 
 //------------------------`(mi.)nlSpringDamperClipped`----------------------
 // Implementation of a non-linear viscoelastic spring-damper interaction
-// containing a cubic term (function of distance^3), that is bound by an
+// containing a cubic term (function of distance^3), bound by an
 // upper linear stiffness (hard-clipping).
 //
 // This bounding means that when faced with strong displacements, the
@@ -464,7 +464,7 @@ with{
 // Implementation of a non-linear friction based interaction
 // that allows for stick-slip bowing behaviour.
 // Two versions are proposed : a piecewise linear function (very
-// similar to the nlPluck, or a mathematical approximation (see
+// similar to the nlPluck) or a mathematical approximation (see
 // Stefan Bilbao's book, Numerical Sound Synthesis).
 //
 //
