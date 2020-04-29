@@ -169,7 +169,7 @@ nlPluck(k, scale, z, x1r0, x2r0, x1, x2) =
 	  		ma.signum(deltapos)* -tipdist * k + Kend * deltapos + 
               z* deltavel
 	  		),
-	(k - Kend) * -deltapos
+	(k - Kend) * -deltapos + z* deltavel
 	) <:  *(-1),_
 with{
   deltapos = x1 - x2;
