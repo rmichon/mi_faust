@@ -529,7 +529,7 @@ with{
 
 
 
-//------------------------`(mi.)collision`----------------------
+//------------------------`(mi.)nlCollisionClipped`----------------------
 // Implementation of a collision interaction, producing non-linear
 // visco-elastic repulsion forces when two mass elements are interpenetrating.
 // Bound by an upper stiffness value to maintain stability.
