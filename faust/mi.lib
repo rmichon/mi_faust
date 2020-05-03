@@ -111,9 +111,10 @@ declare copyright "2018-2020 GRAME / GIPSA-Lab";
 // * `x0`: initial value for position
 initState(init) = R(0,init)
 with{
-  R(n,(initn,init)) = +(initn : ba.impulsify@n) : R(n+1,init);
-  R(n,initn) = +(initn : ba.impulsify@n);
+  R(n,(initn,init)) = + (1 :ba.impulsify@n * initn) : R(n+1,init);
+  R(n,initn) = + (1 : ba.impulsify@n * initn );
 };
+
 
 
 
@@ -180,7 +181,7 @@ with{
   C = 1/m;
   equation = x
 	letrec{
-    'x = A*(x : initState(x0)) + B*(x' : initState(x1)) + (_-grav)*(C);
+    'x = A*(x : initState(x0)) + B*(x' : initState((x1, x0))) + (_-grav)*(C);
 	};
 };
 
@@ -265,6 +266,8 @@ with{
 
 //------------------------`(mi.)damper`----------------------
 // Implementation of a linear damper interaction.
+// Beware: in 32bit precision mode, damping forces can become
+// truncated if position values are not centered around zero !
 //
 // #### Usage
 //
