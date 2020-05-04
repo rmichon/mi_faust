@@ -10,15 +10,16 @@
 // recommended to use a scripting tool (such as MIMS) to generate the FAUST
 // signal routing for a given physical network.
 //
-// https://github.com/rmichon/mi_faust
-// http://mi-creative.eu/tool_miFaust.html
-// http://mi-creative.eu/paper_lac19.html
+// <https://github.com/rmichon/mi_faust>
+// <http://mi-creative.eu/tool_miFaust.html>
+// <http://mi-creative.eu/paper_lac19.html>
 //
 //
 // ## Sources
 //
 // The core mass-interaction algorithms implemented in this library are in the public
 // domain and are disclosed in the following scientific publications:
+//
 // * Claude Cadoz, Annie Luciani, Jean-Loup Florens, Curtis Roads and Françoise
 // Chabade. Responsive Input Devices and Sound Synthesis by Stimulation of
 // Instrumental Mechanisms: The Cordis System. Computer Music Journal, Vol 8.
@@ -41,37 +42,6 @@
 // * James Leonard and Claude Cadoz. Physical Modelling Concepts for a Collection
 // of Multisensory Virtual Musical Instruments. In Proceedings of the New
 // Interfaces for Musical Expression (NIME-15) Conference, Baton Rouge, USA, 2015.
-//
-// ## License
-//
-// The MIT License (MIT)
-//
-// Copyright (c) <2019> <GRAME-CNCM (Lyon, France) and Gipsa-Lab (Grenoble,
-// France)>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
-//
-// * Section Utility Functions
-// * Section Mass Algorithms
-// * Section Interaction Algorithms
-//
 //##############################################################################
 
 
@@ -109,12 +79,12 @@ declare copyright "2018-2020 GRAME / GIPSA-Lab";
 //
 // * `x`: position value signal
 // * `x0`: initial value for position
+//---------------------------------------------------------
 initState(init) = R(0,init)
 with{
-  R(n,(initn,init)) = + (1 :ba.impulsify@n * initn) : R(n+1,init);
-  R(n,initn) = + (1 : ba.impulsify@n * initn );
+  R(n,(initn,init)) = +(initn : ba.impulsify@n) : R(n+1,init);
+  R(n,initn) = +(initn : ba.impulsify@n);
 };
-
 
 
 
@@ -143,6 +113,7 @@ with{
 // * `grav`: gravity force value
 // * `x0`: initial position
 // * `xr0`: initial delayed position (inferred from initial velocity)
+//---------------------------------------------------------
 mass(m, grav, x0, x1) = equation
 with{
   A = 2;
@@ -174,6 +145,7 @@ with{
 // * `grav`: gravity force value
 // * `x0`: initial position
 // * `xr0`: initial delayed position (inferred from initial velocity)
+//---------------------------------------------------------
 osc(m, k, z, grav, x0, x1) = equation
 with{
   A = 2 - (k + z)/m;
@@ -202,6 +174,7 @@ with{
 // Where:
 //
 // * `x0`: initial position
+//---------------------------------------------------------
 ground(x0) = equation
 with{
   // could this term be removed or simlified? Need "unused" input force signal for the routing scheme to work
@@ -228,6 +201,7 @@ with{
 // Where:
 //
 // * `x0`: initial position
+//---------------------------------------------------------
 posInput(init) = _,_ : !,_ : initState(init);
 
 
@@ -256,6 +230,7 @@ posInput(init) = _,_ : !,_ : initState(init);
 // * `k`: stiffness value
 // * `x1r`: initial delayed position of mass 1 (unused here)
 // * `x2r`: initial delayed position of mass 2 (unused here)
+//---------------------------------------------------------
 spring(k, x1r0, x2r0, x1, x2) = 
   k*deltapos <: *(-1),_
 with{
@@ -267,7 +242,7 @@ with{
 //------------------------`(mi.)damper`----------------------
 // Implementation of a linear damper interaction.
 // Beware: in 32bit precision mode, damping forces can become
-// truncated if position values are not centered around zero !
+// truncated if position values are not centered around zero!
 //
 // #### Usage
 //
@@ -280,6 +255,7 @@ with{
 // * `z`: damping value
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 damper(z, x1r0, x2r0, x1, x2) = 
   z*deltavel <: *(-1),_
 with{
@@ -304,6 +280,7 @@ with{
 // * `z`: damping value
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 springDamper(k, z, x1r0, x2r0, x1, x2) = 
   k*deltapos + 
   z*deltavel <: *(-1),_
@@ -333,6 +310,7 @@ with{
 // * `z`: damping value
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 nlSpringDamper2(k, q, z, x1r0, x2r0, x1, x2) =
   k*deltapos + q * ma.signum(deltapos) * pow(deltapos, 2) +
   z*deltavel <: *(-1),_
@@ -362,6 +340,7 @@ with{
 // * `z`: damping value
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 nlSpringDamper3(k, q, z, x1r0, x2r0, x1, x2) =
   k*deltapos + q * pow(deltapos, 3) +
   z*deltavel <: *(-1),_
@@ -399,6 +378,7 @@ with{
 // * `z`: (linear) damping value
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 nlSpringDamperClipped(s, c, k, z, x1r0, x2r0, x1, x2) =
     select2(c == 0,
         select2(s >= k,
@@ -442,6 +422,7 @@ with{
 // * `z`: (linear) damping value
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 nlPluck(k, scale, z, x1r0, x2r0, x1, x2) = 
   select2(absdeltapos < tipdist,
     select2(absdeltapos < scale,
@@ -484,6 +465,7 @@ with{
 // * `type`: interaction profile (0 = piecewise linear, 1 = smooth function)
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 nlBow(z, scale, type, x1r0, x2r0, x1, x2) =
   select2(type > 0,
     select2(absdeltavel < tipvel,
@@ -524,6 +506,7 @@ with{
 // * `thres`: threshold distance for the contact between elements
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 collision(k,z,thres,x1r0,x2r0,x1,x2) = 
   springDamper(k,z,x1r0,x2r0,x1+thres,x2) : (select2(comp,0,_),select2(comp,0,_))
 with{
@@ -554,6 +537,7 @@ with{
 // * `thres`: threshold distance for the contact between elements
 // * `x1r`: initial delayed position of mass 1
 // * `x2r`: initial delayed position of mass 2
+//---------------------------------------------------------
 nlCollisionClipped(s, c, k, z, thres, x1r0, x2r0, x1, x2) = 
   nlSpringDamperClipped(s,c,k,z,x1r0,x2r0,x1+thres,x2) : (select2(comp,0,_),select2(comp,0,_))
 with{
