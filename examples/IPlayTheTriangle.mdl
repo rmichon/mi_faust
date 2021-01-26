@@ -12,10 +12,10 @@
 @m_m2 mass 1. 0. 0.
 
 # Create and connect interaction modules
-@m_r0 spring @m_s0 @m_m0 0.05 0.01
-@m_r1 spring @m_m0 @m_m1 m_K m_Z
-@m_r2 spring @m_m1 @m_m2 m_K m_Z
-@m_r2 spring @m_m2 @m_m0 m_K m_Z
+@m_r0 springDamper @m_s0 @m_m0 0.05 0.01
+@m_r1 springDamper @m_m0 @m_m1 m_K m_Z
+@m_r2 springDamper @m_m1 @m_m2 m_K m_Z
+@m_r2 springDamper @m_m2 @m_m0 m_K m_Z
 
 # Inputs and outputs
 @in1 posInput 0.
